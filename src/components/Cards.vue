@@ -36,7 +36,7 @@ blogPosts.value = blogJson.map(
     wpPostTerms,
     topic: wpPostTerms
       ?.flat()
-      .find((term) => term.taxonomy === "group" || term.taxonomy === "post_tag")?.name,
+      .find((term) => ["group", "post_tag"].includes(term.taxonomy))?.name,
   })
 );
 console.log(blogPosts.value);
