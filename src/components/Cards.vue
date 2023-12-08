@@ -9,30 +9,56 @@ const response = await fetch(blogUrl);
 const blogJson = await response.json();
 console.log(blogJson);
 
-blogPosts.value = blogJson.map(({ title, excerpt, date, link,
-  _embedded: { "wp:term": wpPostTerms, author: authors } }: { title: RenderedProp; excerpt: RenderedProp; date: string; link: string; _embedded: WPEmbeddedPostMeta }) => ({
-  title: title.rendered,
-  excerpt: excerpt.rendered,
-  date: new Date(date),
-  link: link,
-  author: authors[0]?.name,
-  topic: wpPostTerms.find((term) => term.taxonomy === "topic")?.name,
-}));
+blogPosts.value = blogJson.map(
+  ({
+    title,
+    excerpt,
+    date,
+    link,
+    featured_media,
+    _embedded: { "wp:term": wpPostTerms, author: authors, "wp:featuredmedia": images },
+  }: {
+    title: RenderedProp;
+    excerpt: RenderedProp;
+    date: string;
+    link: string;
+    featured_media: string;
+    _embedded: WPEmbeddedPostMeta;
+  }) => ({
+    title: title.rendered,
+    excerpt: excerpt.rendered,
+    date: new Date(date),
+    link: link,
+    author: authors?.[0]?.name,
+    authorLink: authors?.[0]?.link,
+    imgUrl: featured_media,
+    altText: images?.[0]?.alt_text,
+    wpPostTerms,
+    topic: wpPostTerms
+      ?.flat()
+      .find((term) => term.taxonomy === "group" || term.taxonomy === "post_tag")?.name,
+  })
+);
 console.log(blogPosts.value);
 console.log("blogPosts.value");
 </script>
 
 <template>
-  <Card
-    v-for="({ title, excerpt, date, link, topic }, index) in blogPosts"
-    :key="index"
-    :title="title"
-    :author="'neep'"
-    :excerpt="excerpt"
-    :date="date"
-    :topic="topic"
-    :href="link"
-  />
+  <div class="row">
+    <Card
+      v-for="(
+        { title, excerpt, date, link, author, authorLink, imgUrl, topic, altText }, index
+      ) in blogPosts"
+      :key="index"
+      :title="title"
+      :author="author"
+      :authorLink="authorLink"
+      :excerpt="excerpt"
+      :date="date"
+      :topic="topic"
+      :href="link"
+      :imgUrl="imgUrl"
+      :altText="altText"
+    />
+  </div>
 </template>
-
-<style scoped></style>

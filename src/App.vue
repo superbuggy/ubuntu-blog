@@ -8,5 +8,3 @@ import Cards from './components/Cards.vue'
     <template #fallback> Loading... </template>
   </Suspense>
 </template>
-
-<style scoped></style>
